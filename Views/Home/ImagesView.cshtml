@@ -3,43 +3,33 @@
     ViewData["Title"] = "View";
 }
 
-<h1>View</h1>
+@{
+    ViewData["Title"] = "Home Page";
+}
+<h1>圖片辨識</h1>
 <div class="container">
     <div class="form-group">
-        <label class=" "form-label">網址</label>
-        <input id="imageUrl" type="text" class="form-control" value="https://s.yimg.com/ny/api/res/1.2/UXtYWiRrL26.yzHTQ4WZdw--/YXBwaWQ9aGlnaGxhbmRlcjt3PTk2MDtoPTY0MDtjZj13ZWJw/https://media.zenfs.com/en/petsmao_nownews_707/5c8b28383482edc00353e09533de7322" />
+        <label class="form-label">網址:</label>
+        <input id="imageUrl" type="text" class="form-control" value="" />
     </div>
-
-    <div>
-        <img src="~/images/noimage.png" id="imgPreview" style="height:400px;"/>
+    <div class="form-group">
+        <button class="btn btn-primary" onclick="anlyzeImage()">辨識</button>
     </div>
-    <button class="btn-primary" onclick="ViewImage()">辨識</button>
-
 </div>
-<div>
 
-</div>
 @section Scripts{
 
     <script type="text/javascript">
-        $(function () {
-            function ViewImage() {
-                $("#imgPreview").attr();
 
-                var params = {
-                    // Request parameters
-                    "visualFeatures": "Description",
-                   // "details": "{string}",
-                    "language": "en",
-                    "model-version": "latest",
-                };
-
-                var data = {
-                    url: $("#imageUrl").val()
-                };
-
-            }
-            
+        function anlyzeImage() {
+            var params = {
+                // Request parameters
+                "visualFeatures": "Description,Tags",
+                // "details": "{string}",
+                "language": "zh",
+                "model-version": "latest",
+            };
+            var data = { url: $("#imageUrl").val() };
 
             $.ajax({
                 url: "https://msit150team02vision.cognitiveservices.azure.com/vision/v3.2/analyze?" + $.param(params),
@@ -51,18 +41,17 @@
                 type: "POST",
                 // Request body
                 data: JSON.stringify(data),
-            }).done(function (data) {
-                    alert(data);
-                })
-                .fail(function (err) {
-                    alert(err.statusText);
-                });
-        
-        }
+            })
+                .done(function (data) {
+                    // alert(JSON.stringify(data));
+                    var text = data['description']['captions'][0]['text'];
+                    var confidence = data['description']['captions'][0]['confidence'];
+                    alert(`內容: ${ text }, 信心指數: ${(confidence * 100).toFixed(2)} %`);
+        })
+                   .fail(function () {
+            alert("error");
+        });
+                   }
     </script>
-   
-
-
 }
-
 

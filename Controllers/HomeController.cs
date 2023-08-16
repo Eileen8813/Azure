@@ -35,5 +35,9 @@ namespace Azure.Controllers
         {
             return View();
         }
+        public IActionResult ImagesViewTo()
+        {
+            return View();
+        }
     }
 }

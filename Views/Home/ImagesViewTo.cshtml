@@ -59,24 +59,33 @@
 
                     $.ajax({
                         url: "https://msit150team02vision.cognitiveservices.azure.com/vision/v3.2/analyze?" + $.param(params),
-                        beforeSend: function (xhrObj) {
+                        //$.param(params)是把括號裡的東西轉成網址查詢格式
+
+                        beforeSend: function (xhrObj) {   
                             // Request headers
                             xhrObj.setRequestHeader("Content-Type", "application/octet-stream");
                             xhrObj.setRequestHeader("Ocp-Apim-Subscription-Key", "e1b7bcaed4494328a9dc6ab2c461f893");
                         },
+
+                //xhrObj.setRequestHeader("Content-Type", "application/octet-stream");：這行設置了請求
+                // 的 Content-Type 標頭，指示伺服器接收的數據類型是二進制數據（應用程式/octet-stream）。
+                // 這在您可能向伺服器提交二進制數據（如圖像）時很常見。
+
+                //xhrObj.setRequestHeader("Ocp-Apim-Subscription-Key",XXXXX)=Azure 訂閱金鑰
+
                         type: "POST",
                         // Request body
-                        processData: false,
+                processData: false,  //防止 jQuery 對請求數據進行處理
 
                         data: arrayBuffer,
                     })
-                        .done(function (data) {
+                        .done(function (data) {  //成功的時候
                             // alert(JSON.stringify(data));
                             var text = data['description']['captions'][0]['text'];
                             var confidence = data['description']['captions'][0]['confidence'];
                             alert(`內容: ${text}, 信心指數: ${(confidence * 100).toFixed(2)} %`);
                         })
-                        .fail(function () {
+                .fail(function () {  //失敗的時候
                             alert("error");
                         });
                 }

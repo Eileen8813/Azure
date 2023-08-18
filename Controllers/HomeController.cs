@@ -39,5 +39,9 @@ namespace Azure.Controllers
         {
             return View();
         }
+        public IActionResult ImagesRobot()
+        {
+            return View();
+        }
     }
 }

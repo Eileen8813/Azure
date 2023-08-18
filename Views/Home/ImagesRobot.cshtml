@@ -1,0 +1,86 @@
+﻿
+@{
+    ViewData["Title"] = "ImagesRobot";
+}
+
+<h1>ImagesRobot</h1>
+
+
+<div class="container">
+    <div class="form-group">
+        <label class="form-label">圖片檔案:</label>
+        <input accept="image/*" id="uploadFile" type="file" />
+    </div>
+    <img id="imgPreview" src="~/images/noimage.png" class="h-50 w-50" />
+    <div class="form-group">
+        <button class="btn btn-primary" onclick="anlyzeImage()">辨識</button>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+        var arrayBuffer = null;
+        $("#uploadFile").on("change", function () {
+            var file = this.files[0];
+            var allowFileType = "image.*"
+
+            if (file.type.match(allowFileType)) {
+                var reader = new FileReader();
+                reader.onload = function () {
+
+                    arrayBuffer = this.result;
+                    var blob = new Blob([arrayBuffer], { type: "image/jpeg" });
+                    var urlCreator = window.URL || window.webkitURL;
+                    var objectUrl = urlCreator.createObjectURL(blob);
+                    $("#imgPreview").attr("src", objectUrl);
+
+                };
+                reader.readAsArrayBuffer(file);
+
+            }
+            else {
+                alert("檔案格式錯誤!");
+
+            }
+
+        });
+
+
+        function anlyzeImage() {
+      
+
+            $.ajax({
+                url: "https://msit150robot-prediction.cognitiveservices.azure.com/customvision/v3.0/Prediction/e9443028-2c31-4ef0-ab32-84acc718be51/classify/iterations/Iteration1/image",
+                beforeSend: function (xhrObj) {
+                    // Request headers
+                    xhrObj.setRequestHeader("Content-Type", "application/octet-stream");
+                    xhrObj.setRequestHeader("Prediction-Key", "47e874b5748149a5b37a6ad8076b8d81");
+                },
+                type: "POST",
+                processData: false,  //防止 jQuery 對請求數據進行處理
+                data: arrayBuffer,
+
+            } )
+                .done(function (data) {  //成功的時候
+                    console.log(data);
+                    var tagName = data['predictions'][0]['tagName'];
+                    var confidence = data['predictions'][0]['probability'];
+                   
+
+                    alert(`內容: ${tagName}, 信心指數: ${(confidence * 100).toFixed(2)} %`);
+                })
+                .fail(function (err) {
+                    alert(err.statusText);
+                });
+        }
+
+
+
+        
+    </script>
+}
+
+
+
